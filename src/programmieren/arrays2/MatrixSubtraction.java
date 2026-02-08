@@ -1,4 +1,4 @@
-package src.arrays2;
+package programmieren.arrays2;
 
 import java.util.Scanner;
 

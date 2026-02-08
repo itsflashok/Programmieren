@@ -1,5 +1,4 @@
-package src.arrays;
-
+package programmieren.arrays;
 import java.util.Scanner;
 
 public class DotProduct {

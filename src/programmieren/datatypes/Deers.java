@@ -1,4 +1,4 @@
-package src.programmieren.datatypes;
+package programmieren.datatypes;
 
 public class Deers {
     public static void main(String[] args) {

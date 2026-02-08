@@ -1,4 +1,4 @@
-package src.programmieren.datatypes;
+package programmieren.datatypes;
 
 import java.util.Scanner;
 

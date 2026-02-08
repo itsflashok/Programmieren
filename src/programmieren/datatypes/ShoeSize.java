@@ -1,4 +1,4 @@
-package src.programmieren.datatypes;
+package programmieren.datatypes;
 
 public class ShoeSize {
     public static void main(String[] args) {

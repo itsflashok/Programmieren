@@ -1,4 +1,4 @@
-package src.programmieren.datatypes;
+package programmieren.datatypes;
 
 public class ShortValue {
     public static void main(String[] args) {

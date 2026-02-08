@@ -1,4 +1,4 @@
-package src.programmieren;
+package programmieren;
 
 public class my_first_programm {
     public static void main(String[] args) {
