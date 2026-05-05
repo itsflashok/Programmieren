@@ -1,0 +1,2 @@
+Game result: -39 - 141
+Game result: Player Alice scored 540 points with 9 darts. Player Bob scored 360 points with 6 darts.
