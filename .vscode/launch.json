@@ -6,6 +6,55 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Library",
+      "request": "launch",
+      "mainClass": "programmieren.datenstrukturen.Library",
+      "projectName": "Programmieren_449264d4"
+    },
+    {
+      "type": "java",
+      "name": "Lottery",
+      "request": "launch",
+      "mainClass": "programmieren.datenstrukturen.Lottery",
+      "projectName": "Programmieren_449264d4"
+    },
+    {
+      "type": "java",
+      "name": "Election",
+      "request": "launch",
+      "mainClass": "programmieren.ui.Election",
+      "projectName": "Programmieren_449264d4"
+    },
+    {
+      "type": "java",
+      "name": "ShellGame",
+      "request": "launch",
+      "mainClass": "programmieren.ui.ShellGame",
+      "projectName": "Programmieren_449264d4"
+    },
+    {
+      "type": "java",
+      "name": "NumberGuess",
+      "request": "launch",
+      "mainClass": "programmieren.ui.NumberGuess",
+      "projectName": "Programmieren_449264d4"
+    },
+    {
+      "type": "java",
+      "name": "BinaryNumber",
+      "request": "launch",
+      "mainClass": "programmieren.ui.BinaryNumber",
+      "projectName": "Programmieren_449264d4"
+    },
+    {
+      "type": "java",
+      "name": "BMICalculator",
+      "request": "launch",
+      "mainClass": "programmieren.ui.BMICalculator",
+      "projectName": "Programmieren_449264d4"
+    },
+    {
+      "type": "java",
       "name": "EditorSimple",
       "request": "launch",
       "mainClass": "programmieren.ui.EditorSimple",

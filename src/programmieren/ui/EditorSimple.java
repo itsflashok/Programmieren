@@ -1,11 +1,27 @@
 package programmieren.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 
-public class EditorSimple {
+public class EditorSimple implements ActionListener {
     JFrame frame = new JFrame("Editor");
     JMenu menuDatei = new JMenu("Datei");
     JMenu menuBearbeiten = new JMenu("Bearbeiten");
@@ -55,9 +71,18 @@ public class EditorSimple {
     JMenuItem menuItemVerknuepfungen = new JMenuItem("Verknüpfungen...");
     JMenuItem menuItemObjekt = new JMenuItem("Objekt");
 
+    JTextPane editPane = new JTextPane();
+    JScrollPane scrollPane = new JScrollPane(editPane);
+    File currentFile = null;
+
     public EditorSimple() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 300);
+        frame.setSize(640, 480);
+        frame.setLayout(new BorderLayout());
+
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        frame.add(scrollPane, BorderLayout.CENTER);
+
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(menuDatei);
         menuBar.add(menuBearbeiten);
@@ -121,6 +146,18 @@ public class EditorSimple {
         menuBearbeiten.add(menuItemVerknuepfungen);
         menuBearbeiten.add(menuItemObjekt);
 
+        menuItemSpeichern.setEnabled(false);
+
+        menuItemNeu.addActionListener(this);
+        menuItemOeffnen.addActionListener(this);
+        menuItemSpeichern.addActionListener(this);
+        menuItemSpeichernUnter.addActionListener(this);
+        menuItemBeenden.addActionListener(this);
+        menuItemKopieren.addActionListener(this);
+        menuItemAusschneiden.addActionListener(this);
+        menuItemEinfuegen.addActionListener(this);
+        menuItemAllesMarkieren.addActionListener(this);
+
         frame.setVisible(true);
     }
 
@@ -128,4 +165,120 @@ public class EditorSimple {
         new EditorSimple();
     }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object src = e.getSource();
+
+        if (src == menuItemNeu) {
+            if (!editPane.getText().isEmpty()) {
+                int answer = JOptionPane.showConfirmDialog(frame,
+                        "Möchten Sie die aktuelle Datei speichern?", "Neu",
+                        JOptionPane.YES_NO_CANCEL_OPTION);
+                if (answer == JOptionPane.CANCEL_OPTION) return;
+                if (answer == JOptionPane.YES_OPTION && !saveToFile(false)) return;
+            }
+            editPane.setText("");
+            currentFile = null;
+            menuItemSpeichern.setEnabled(false);
+            frame.setTitle("Editor");
+        }
+
+        if (src == menuItemOeffnen) {
+            JFileChooser chooser = new JFileChooser();
+            if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
+                currentFile = chooser.getSelectedFile();
+                try (FileReader reader = new FileReader(currentFile)) {
+                    StringBuilder sb = new StringBuilder();
+                    int c;
+                    while ((c = reader.read()) != -1) {
+                        sb.append((char) c);
+                    }
+                    editPane.setText(sb.toString());
+                    menuItemSpeichern.setEnabled(true);
+                    frame.setTitle("Editor – " + currentFile.getName());
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(frame, "Fehler beim Öffnen: " + ex.getMessage());
+                }
+            }
+        }
+
+        if (src == menuItemSpeichern) {
+            saveToFile(false);
+        }
+
+        if (src == menuItemSpeichernUnter) {
+            saveToFile(true);
+        }
+
+        if (src == menuItemBeenden) {
+            int answer = JOptionPane.showConfirmDialog(frame,
+                    "Programm wirklich beenden?", "Beenden", JOptionPane.YES_NO_OPTION);
+            if (answer == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        }
+
+        if (src == menuItemKopieren) {
+            copySelectionToClipboard();
+        }
+
+        if (src == menuItemAusschneiden) {
+            copySelectionToClipboard();
+            editPane.replaceSelection("");
+        }
+
+        if (src == menuItemEinfuegen) {
+            doPaste();
+        }
+
+        if (src == menuItemAllesMarkieren) {
+            editPane.selectAll();
+        }
+    }
+
+    /**
+     * Copy content to clipboard
+     *
+     * @param content content to copy
+     */
+    private boolean saveToFile(boolean saveAs) {
+        if (saveAs || currentFile == null) {
+            JFileChooser chooser = new JFileChooser();
+            if (chooser.showSaveDialog(frame) != JFileChooser.APPROVE_OPTION) return false;
+            currentFile = chooser.getSelectedFile();
+        }
+        try (FileWriter writer = new FileWriter(currentFile)) {
+            writer.write(editPane.getText());
+            menuItemSpeichern.setEnabled(true);
+            frame.setTitle("Editor – " + currentFile.getName());
+            return true;
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(frame, "Fehler beim Speichern: " + ex.getMessage());
+            return false;
+        }
+    }
+
+    public void copySelectionToClipboard() {
+        String content = this.editPane.getSelectedText();
+        if (content != null) {
+            StringSelection selection = new StringSelection(content);
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(selection, selection);
+        }
+    }
+
+    /**
+     * Paste clipboard content, just inserts at current caret position and ignores
+     * selection (text editors usually replace selected text with clipboard content)
+     */
+    public void doPaste() {
+        try {
+            String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+            if (data != null) {
+                this.editPane.getDocument().insertString(this.editPane.getCaretPosition(), data, null);
+            }
+        } catch (Exception e) {
+
+        }
+    }
 }
